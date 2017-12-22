@@ -3,3 +3,4 @@
 // forms the basic for accept arguments when users run your programms.
 const [nodePath, scriptPath, name] = process.argv;
 console.log('Hello', nodePath, scriptPath, name);
+console.log('hhh');
