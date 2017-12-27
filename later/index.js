@@ -1,5 +1,9 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const read = require('node-readability');
+
+// user module
+const Article = require('./db').Article;
 
 // build a app
 const app = express();
@@ -10,30 +14,64 @@ const port = process.env.PORT || 3000;
 
 app.set('port', port);
 
+// add midlleware
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
+app.use(
+  './css/bootstrap.css',
+  express.static('node_modules/bootstrap/dist/css/bootstrap.css'),
+);
 
 app.get('/articles', (req, res, next) => {
-  res.send(articles);
-});
-
-app.post('/articles', (req, res, next) => {
-  const article = {title: req.body.title};
-  articles.push(article);
-  res.send(article);
+  Article.all((err, articles) => {
+    if (err) {
+      return next(err);
+    }
+    res.format({
+      html: () => {
+        res.render('article.ejs', {articles: articles});
+      },
+      json: () => {
+        res.send(articles);
+      },
+    });
+  })
 });
 
 app.get('/articles/:id', (req, res, next) => {
   const id = req.params.id;
-  console.log('Fetching:', id);
-  res.send(articles[id]);
+  Article.find(id, (err, article) => {
+    if (err) {
+      return next(err);
+    }
+    res.send(article);
+  })
+});
+
+app.post('/articles', (req, res, next) => {
+  const url = req.body.url;
+
+  read(url, (err, result) => {
+    Article.create(
+      {title: result.title, content: result.content},
+      (err, article) => {
+        if (err) {
+          return next(err);
+        }
+        res.send('Successfully created!');
+      }
+    )
+  });
 });
 
 app.delete('/articles/:id', (req, res, next) => {
   const id = req.params.id;
-  console.log('Deleting:', id);
-  delete articles[id];
-  res.send({message: 'Deleted'});
+  Article.delete(id, (err) => {
+    if (err) {
+      return next(err);
+    }
+    res.send({message: 'Deleted'});
+  })
 });
 
 app.listen(app.get('port'), () => {
