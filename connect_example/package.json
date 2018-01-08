@@ -1,5 +1,5 @@
 {
-  "name": "node_in_action",
+  "name": "connect_example",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -10,11 +10,6 @@
   "author": "pftom <1043269994@qq.com>",
   "license": "MIT",
   "dependencies": {
-    "async": "^2.6.0",
-    "bootstrap": "^3.3.7",
-    "connect": "^3.4.0",
-    "ejs": "^2.5.7",
-    "express": "^4.16.2",
-    "node-readability": "^3.0.0"
+    "connect": "^3.4.0"
   }
 }
