@@ -9,6 +9,9 @@ var index = require('./routes/index');
 var users = require('./routes/users');
 const entries = require('./routes/entries');
 
+// middleware
+const validate = require('./middleware/validate');
+
 var app = express();
 
 // view engine setup
@@ -30,7 +33,11 @@ app.get('/', entries.list);
 
 // entries
 app.get('/post', entries.form);
-app.post('/post', entries.submit);
+app.post('/post', 
+  validate.required('entry[title]'),
+  validate.lengthAbove('entry[title]', 4),
+  entries.submit,
+);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
