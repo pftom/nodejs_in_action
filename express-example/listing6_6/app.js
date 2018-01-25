@@ -1,13 +1,15 @@
-var express = require('express');
-var path = require('path');
-var favicon = require('serve-favicon');
-var logger = require('morgan');
-var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
+const express = require('express');
+const path = require('path');
+const favicon = require('serve-favicon');
+const logger = require('morgan');
+const cookieParser = require('cookie-parser');
+const bodyParser = require('body-parser');
+const session = require('express-session');
 
-var index = require('./routes/index');
-var users = require('./routes/users');
+const index = require('./routes/index');
+const users = require('./routes/users');
 const entries = require('./routes/entries');
+const register = require('./routes/register');
 
 // middleware
 const validate = require('./middleware/validate');
@@ -27,6 +29,14 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
+
+// add session support
+app.use(session({
+  secret: 'secret',
+  resave: false,
+  saveUninitialized: true,
+}));
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/', entries.list);
@@ -38,6 +48,9 @@ app.post('/post',
   validate.lengthAbove('entry[title]', 4),
   entries.submit,
 );
+
+app.get('/register', register.form);
+app.post('/register', register.submit);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
